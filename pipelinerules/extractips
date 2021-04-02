@@ -1,0 +1,22 @@
+rule "Extract Intrusion Event fields"
+when
+  has_field("message") AND contains(to_string($message.`sysloghost`),"fpmc")
+then
+  let Attack_name = regex("((?<=\\]\\s\").+?(?=\"))", to_string($message.message));
+  let Attack_impact = regex("((?<=\\[Impact:\\s).+?(?=]))", to_string($message.message));
+  let Attack_priority = regex("((?<=\\[Priority:\\s).+?(?=]))", to_string($message.message));
+  let Attack_classification = regex("((?<=\\[Classification:\\s).+?(?=]))", to_string($message.message));
+  let Attack_details = regex("((?=\\{\\w+\\}\\s).+?$)",to_string($message.message));
+  let Attack_details_fixed=grok(pattern:"\\{%{WORD:protocol}\\} %{IPV4:src_ip}:%{INT:src_port} \\(%{DATA:fmc_src_country_name}\\)->%{IPV4:dst_ip}:%{INT:dst_port} \\(%{DATA:fmc_dst_country_name}\\)",value: to_string(Attack_details["0"]),only_named_captures: true);
+  
+  set_field("attack_name", Attack_name["0"]);
+  set_field("attack_impact", Attack_impact["0"]);
+  set_field("attack_priority", Attack_priority["0"]);
+  set_field("attack_classification", Attack_classification["0"]);
+  set_fields(Attack_details_fixed);
+  
+  remove_field("syslog_pri");
+  remove_field("syslog_program");
+  remove_field("sysloghost");
+  
+end
