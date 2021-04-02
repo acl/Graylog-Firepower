@@ -1,0 +1,40 @@
+rule "Extract SFR fields"
+when
+  has_field("message") && has_field("ciscotag")
+then
+  let SrcIP = regex("((?<=SrcIP:\\s).+?(?=,))", to_string($message.message));
+  let DstIP = regex("((?<=DstIP:\\s).+?(?=,))", to_string($message.message));
+  let URL = regex("((?<=URL:\\s).*)", to_string($message.message));
+  let IngressZone = regex("((?<=IngressZone:\\s).+?(?=,))", to_string($message.message));
+  let Protocol = regex("((?<=\\sProtocol:\\s).+?(?=,))", to_string($message.message));
+  let EgressZone = regex("((?<=EgressZone:\\s).+?(?=,))", to_string($message.message));
+  let SrcPort = regex("((?<=SrcPort:\\s).+?(?=,))", to_string($message.message));
+  let DstPort = regex("((?<=DstPort:\\s).+?(?=,))", to_string($message.message));
+  let AccessControlRuleAction = regex("((?<=AccessControlRuleAction:\\s).+?(?=,))", to_string($message.message));
+  let AccessControlRuleReason = regex("((?<=AccessControlRuleReason:\\s).+?(?=,))", to_string($message.message));
+  let AccessControlRuleName = regex("((?<=AccessControlRuleName:\\s).+?(?=,))", to_string($message.message));
+  let ApplicationProtocol = regex("((?<=ApplicationProtocol:\\s).+?(?=,))", to_string($message.message));
+  let NAPPolicy = regex("((?<=NAPPolicy:\\s).+?((?=,)|$))", to_string($message.message));
+  let DNSQuery = regex("((?<=DNSQuery:\\s).+?(?=,))", to_string($message.message));
+  let IPReputationSICategory = regex("((?<=IPReputationSICategory:\\s).*)", to_string($message.message));
+
+  set_field("src_ip", SrcIP["0"]);
+  set_field("dst_ip", DstIP["0"]);
+  set_field("url", URL["0"]);
+  set_field("ingress_zone", IngressZone["0"]);
+  set_field("protocol", Protocol["0"]);
+  set_field("egress_zone", EgressZone["0"]);
+  set_field("src_port", SrcPort["0"]);
+  set_field("dst_port", DstPort["0"]);
+  set_field("rule_action", AccessControlRuleAction["0"]);
+  set_field("rule_reason", AccessControlRuleReason["0"]);
+  set_field("rule_name",AccessControlRuleName["0"]);
+  set_field("app_protocol", ApplicationProtocol["0"]);
+  set_field("NAP_policyname", NAPPolicy["0"]);
+  set_field("dns_query", DNSQuery["0"]);
+  set_field("ip_reputation", IPReputationSICategory["0"]);
+
+  remove_field("syslog_pri");
+  remove_field("syslog_program");
+  remove_field("sysloghost");  
+end
