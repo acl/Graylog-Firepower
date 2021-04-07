@@ -16,7 +16,7 @@ then
   let ApplicationProtocol = regex("((?<=ApplicationProtocol:\\s).+?(?=,))", to_string($message.message));
   let NAPPolicy = regex("((?<=NAPPolicy:\\s).+?((?=,)|$))", to_string($message.message));
   let DNSQuery = regex("((?<=DNSQuery:\\s).+?(?=,))", to_string($message.message));
-  let IPReputationSICategory = regex("((?<=IPReputationSICategory:\\s).*)", to_string($message.message));
+  let IPReputationSICategory = regex("((?<=IPReputationSICategory:\\s).+?(?=,|$))", to_string($message.message));
 
   set_field("src_ip", SrcIP["0"]);
   set_field("dst_ip", DstIP["0"]);
